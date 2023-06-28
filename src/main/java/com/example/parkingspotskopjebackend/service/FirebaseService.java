@@ -75,28 +75,74 @@ public class FirebaseService {
         });
     }
 
-    public void sendPersonReleasedSpotNotiication(String recipientToken, String senderId, String parkingName) {
+    public void sendPersonReleasedSpotNotification(String recipientToken, String senderId, String parkingName, String parkingId, String senderName) {
         try{
             // Create a Notification instance
             Notification notification = Notification.builder()
                     .setTitle(parkingName+" has a free spot!")
-                    .setBody(senderId+" has just left the parking.")
+                    .setBody(senderName+" has just left the parking.")
                     .build();
 
             // Create a Message instance
             Message message = Message.builder()
                     .setNotification(notification)
+                    .putData("senderId", senderId)
+                    .putData("senderName",senderName)
+                    .putData("parkingId", parkingId)
+                    .putData("parkingName",parkingName)
                     .setToken(recipientToken)
                     .build();
 
             // Send the message
             String response = FirebaseMessaging.getInstance().send(message);
-            System.out.println("Notification sent. Response: " + response);
         }
         catch (Exception e){
             System.out.println(e.getMessage());
         }
-
     }
+
+    public void sayThanksNotification(String senderUserId, String senderUserName, String receiverUserId, String receiverUserName){
+        databaseReference.child("users").child(receiverUserId.replace(".", ",")).child("deviceToken").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String deviceToken = dataSnapshot.getValue(String.class);
+                sendThankYouNotification(deviceToken,senderUserId,senderUserName, receiverUserId,receiverUserName);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+
+        });
+    }
+    public void sendThankYouNotification(String recipientToken, String senderId, String senderName, String receiverUserId, String receiverUserName){
+        try{
+            // Create a Notification instance
+            Notification notification = Notification.builder()
+                    .setTitle(senderName+" has thanked you!")
+                    .setBody(senderName+" thanks you for informing them regarding the spot you left!")
+                    .build();
+
+            // Create a Message instance
+            Message message = Message.builder()
+                    .setNotification(notification)
+                    .putData("type","THANKS")
+                    .putData("senderId", senderId)
+                    .putData("senderName",senderName)
+                    .putData("receiverId", receiverUserId)
+                    .putData("receiverUserName",receiverUserName)
+                    .setToken(recipientToken)
+                    .build();
+
+            // Send the message
+            String response = FirebaseMessaging.getInstance().send(message);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
 
 }

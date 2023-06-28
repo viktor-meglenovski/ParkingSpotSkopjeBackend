@@ -16,6 +16,7 @@ public class NotificationsRestController {
 
     @GetMapping("/sendReleasedSpotNotification")
     public void sendReleasedSpotNotification(@RequestParam  String senderUserId,
+                                             @RequestParam  String senderUserName,
                                              @RequestParam  String parkingId,
                                              @RequestParam  String parkingName){
         firebaseService.getFirstPersonWaitingForParking(parkingId, new PersonReleasedSpotCallback() {
@@ -23,7 +24,7 @@ public class NotificationsRestController {
             public void onFirstPersonFound(String userId, String deviceToken) {
                 if(userId!=null && deviceToken!=null){
                     //send notification to user
-                    firebaseService.sendPersonReleasedSpotNotiication(deviceToken,senderUserId,parkingName);
+                    firebaseService.sendPersonReleasedSpotNotification(deviceToken,senderUserId,parkingName,parkingId,senderUserName);
                 }
             }
 
@@ -33,11 +34,20 @@ public class NotificationsRestController {
             }
         });
     }
+    @GetMapping("/sayThanksNotification")
+    public void sayThanksNotification(@RequestParam String senderUserId,
+                                      @RequestParam String senderUserName,
+                                      @RequestParam String receiverUserId,
+                                      @RequestParam String receiverUserName){
+        firebaseService.sayThanksNotification(senderUserId,senderUserName,receiverUserId,receiverUserName);
+    }
 
     @GetMapping("/sendCustomNotification")
     public void sendCustomNotification(@RequestParam String deviceToken,
+                                       @RequestParam String senderUserName,
                                        @RequestParam String senderUserId,
-                                       @RequestParam String parkingName){
-        firebaseService.sendPersonReleasedSpotNotiication(deviceToken,senderUserId,parkingName);
+                                       @RequestParam String parkingName,
+                                       @RequestParam String parkingId){
+        firebaseService.sendPersonReleasedSpotNotification(deviceToken,senderUserId,parkingName, parkingId,senderUserName);
     }
 }
