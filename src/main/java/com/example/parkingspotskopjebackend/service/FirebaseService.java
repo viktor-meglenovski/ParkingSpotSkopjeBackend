@@ -80,16 +80,17 @@ public class FirebaseService {
             // Create a Notification instance
             Notification notification = Notification.builder()
                     .setTitle(parkingName+" has a free spot!")
-                    .setBody(senderName+" has just left the parking.")
+                    .setBody(senderName+" has just left the parking. Tap to thank them!")
                     .build();
 
             // Create a Message instance
             Message message = Message.builder()
                     .setNotification(notification)
+                    .putData("type","OTHER")
                     .putData("senderId", senderId)
-                    .putData("senderName",senderName)
-                    .putData("parkingId", parkingId)
+                    .putData("senderName", senderName)
                     .putData("parkingName",parkingName)
+                    .putData("parkingId",parkingId)
                     .setToken(recipientToken)
                     .build();
 
@@ -130,9 +131,6 @@ public class FirebaseService {
                     .setNotification(notification)
                     .putData("type","THANKS")
                     .putData("senderId", senderId)
-                    .putData("senderName",senderName)
-                    .putData("receiverId", receiverUserId)
-                    .putData("receiverUserName",receiverUserName)
                     .setToken(recipientToken)
                     .build();
 
